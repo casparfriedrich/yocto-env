@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+set -euxo pipefail
+
+DOCKER_IMAGE=kas
+PROJECT_ROOT=$(realpath $(dirname $0))
+
+docker build \
+  --tag \
+  $DOCKER_IMAGE $PROJECT_ROOT
+
+docker run \
+  --env DL_DIR \
+  --env SSH_AUTH_SOCK \
+  --env SSTATE_DIR \
+  --interactive \
+  --rm \
+  --tty \
+  --volume $PROJECT_ROOT:/workdir \
+  --volume $DL_DIR:$DL_DIR \
+  --volume $SSH_AUTH_SOCK:$SSH_AUTH_SOCK \
+  --volume $SSTATE_DIR:$SSTATE_DIR \
+  --workdir /workdir \
+  $DOCKER_IMAGE kas "$@"
